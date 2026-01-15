@@ -1,4 +1,4 @@
-module github.com/capcom6/go-project-template
+module github.com/backupflex/core
 
 go 1.24.3
 
@@ -6,6 +6,7 @@ require (
 	github.com/go-core-fx/config v0.1.0
 	github.com/go-core-fx/fiberfx v0.1.0
 	github.com/go-core-fx/logger v0.0.1
+	github.com/prometheus/client_golang v1.23.2
 	go.uber.org/fx v1.24.0
 	go.uber.org/zap v1.27.1
 )
@@ -37,14 +38,11 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
-	github.com/prometheus/client_golang v1.23.2 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.4 // indirect
 	github.com/prometheus/procfs v0.19.2 // indirect
-	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.68.0 // indirect
-	github.com/valyala/tcplisten v1.0.0 // indirect
 	go.opentelemetry.io/otel v1.39.0 // indirect
 	go.opentelemetry.io/otel/trace v1.39.0 // indirect
 	go.uber.org/dig v1.19.0 // indirect

@@ -3,9 +3,9 @@ package internal
 import (
 	"context"
 
-	"github.com/capcom6/go-project-template/internal/config"
-	"github.com/capcom6/go-project-template/internal/example"
-	"github.com/capcom6/go-project-template/internal/server"
+	"github.com/backupflex/core/internal/config"
+	"github.com/backupflex/core/internal/example"
+	"github.com/backupflex/core/internal/server"
 	"github.com/go-core-fx/logger"
 	"go.uber.org/fx"
 	"go.uber.org/zap"

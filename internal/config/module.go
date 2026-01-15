@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/capcom6/go-project-template/internal/example"
+	"github.com/backupflex/core/internal/example"
 	"github.com/go-core-fx/fiberfx"
 	"go.uber.org/fx"
 )

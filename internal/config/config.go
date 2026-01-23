@@ -11,16 +11,23 @@ type http struct {
 	Address     string   `koanf:"address"`
 	ProxyHeader string   `koanf:"proxy_header"`
 	Proxies     []string `koanf:"proxies"`
+
+	OpenAPI openapiConfig `koanf:"openapi"`
 }
 
-type exampleConfig struct {
-	Example string `koanf:"example"`
+type openapiConfig struct {
+	Enabled    bool   `koanf:"enabled"`
+	PublicHost string `koanf:"public_host"`
+	PublicPath string `koanf:"public_path"`
+}
+
+type storageConfig struct {
+	Dir string `koanf:"dir"`
 }
 
 type Config struct {
-	HTTP http `koanf:"http"`
-
-	Example exampleConfig `koanf:"example"`
+	HTTP    http          `koanf:"http"`
+	Storage storageConfig `koanf:"storage"`
 }
 
 func Default() Config {
@@ -29,10 +36,13 @@ func Default() Config {
 			Address:     "127.0.0.1:3000",
 			ProxyHeader: "X-Forwarded-For",
 			Proxies:     []string{},
-		},
 
-		Example: exampleConfig{
-			Example: "example",
+			OpenAPI: openapiConfig{
+				Enabled: true,
+			},
+		},
+		Storage: storageConfig{
+			Dir: "./data",
 		},
 	}
 }

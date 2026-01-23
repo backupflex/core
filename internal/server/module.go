@@ -1,9 +1,12 @@
 package server
 
 import (
+	"github.com/backupflex/core/internal/server/docs"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/fiberfx/health"
+	"github.com/go-core-fx/fiberfx/openapi"
 	"github.com/go-core-fx/fiberfx/statuscode"
+	"github.com/go-core-fx/fiberfx/validation"
 	"github.com/go-core-fx/logger"
 	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
@@ -22,12 +25,18 @@ func Module() fx.Option {
 			return opts
 		}),
 
-		fx.Provide(health.NewHandler, fx.Private),
+		fx.Supply(docs.SwaggerInfo),
 
-		fx.Invoke(func(app *fiber.App, health *health.Handler) {
+		fx.Provide(health.NewHandler, fx.Private),
+		fx.Provide(openapi.NewHandler, fx.Private),
+
+		fx.Invoke(func(app *fiber.App, health *health.Handler, openapi *openapi.Handler) {
 			health.Register(app)
 
-			api := app.Group("/api/v1")
+			api := app.Group("api/v1")
+			openapi.Register(api.Group("docs"))
+
+			api.Use(validation.Middleware)
 
 			// messages.Register(api.Group("/messages"))
 

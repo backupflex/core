@@ -5,6 +5,7 @@ import (
 
 	"github.com/backupflex/core/internal/config"
 	"github.com/backupflex/core/internal/server"
+	"github.com/go-core-fx/badgerfx"
 	"github.com/go-core-fx/fiberfx"
 	"github.com/go-core-fx/healthfx"
 	"github.com/go-core-fx/logger"
@@ -17,7 +18,7 @@ func Run(version healthfx.Version) {
 		// CORE MODULES
 		logger.Module(),
 		logger.WithFxDefaultLogger(),
-		// sqlfx.Module(),
+		badgerfx.Module(),
 		// goosefx.Module(),
 		// bunfx.Module(),
 		fiberfx.Module(),

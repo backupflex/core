@@ -2,7 +2,10 @@ package server
 
 import (
 	"github.com/go-core-fx/fiberfx"
+	"github.com/go-core-fx/fiberfx/health"
+	"github.com/go-core-fx/fiberfx/statuscode"
 	"github.com/go-core-fx/logger"
+	"github.com/gofiber/fiber/v2"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 )
@@ -19,15 +22,16 @@ func Module() fx.Option {
 			return opts
 		}),
 
-		// fx.Provide(
-		// 	handlers.NewMessagesHandler,
-		// 	fx.Private,
-		// ),
+		fx.Provide(health.NewHandler, fx.Private),
 
-		// fx.Invoke(func(app *fiber.App, messages *handlers.MessagesHandler) {
-		// 	api := app.Group("/api/v1")
+		fx.Invoke(func(app *fiber.App, health *health.Handler) {
+			health.Register(app)
 
-		// 	messages.Register(api.Group("/messages"))
-		// }),
+			api := app.Group("/api/v1")
+
+			// messages.Register(api.Group("/messages"))
+
+			api.Use(statuscode.New())
+		}),
 	)
 }

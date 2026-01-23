@@ -38,7 +38,9 @@ func Default() Config {
 			Proxies:     []string{},
 
 			OpenAPI: openapiConfig{
-				Enabled: true,
+				Enabled:    true,
+				PublicHost: "",
+				PublicPath: "",
 			},
 		},
 		Storage: storageConfig{

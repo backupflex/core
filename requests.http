@@ -5,9 +5,9 @@
 GET {{baseUrl}}/health HTTP/1.1
 
 ###
-GET {{baseUrl}}/api/v1 HTTP/1.1
+GET {{apiUrl}} HTTP/1.1
 Accept: application/json
 
 ###
-GET {{baseUrl}}/api/v1/docs HTTP/1.1
+GET {{apiUrl}}/docs HTTP/1.1
 Accept: application/json

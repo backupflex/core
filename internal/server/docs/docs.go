@@ -14,17 +14,390 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {}
+    "paths": {
+        "/agents/heartbeat": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update agent last seen timestamp to maintain liveness",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Send agent heartbeat",
+                "responses": {
+                    "204": {
+                        "description": "No content, heartbeat accepted"
+                    },
+                    "401": {
+                        "description": "Invalid or missing bearer token",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Agent not found",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/agents/register": {
+            "post": {
+                "description": "Register a new agent with the coordinator and receive an access token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Agents"
+                ],
+                "summary": "Register a new agent",
+                "parameters": [
+                    {
+                        "description": "Agent registration request",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/agents.registerRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Agent registered successfully",
+                        "schema": {
+                            "$ref": "#/definitions/agents.registerResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid request body or role",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Agent already exists",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/agents": {
+            "get": {
+                "description": "Retrieve a list of all registered agents (management only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Management"
+                ],
+                "summary": "List all registered agents",
+                "responses": {
+                    "200": {
+                        "description": "List of agents",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/agents.agent"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/agents/{id}": {
+            "get": {
+                "description": "Retrieve details of a specific agent by its ID (management only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Management"
+                ],
+                "summary": "Get agent details",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Agent details",
+                        "schema": {
+                            "$ref": "#/definitions/agents.agent"
+                        }
+                    },
+                    "404": {
+                        "description": "Agent not found",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Permanently remove an agent from the system (management only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Management"
+                ],
+                "summary": "Delete an agent",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Agent deleted successfully"
+                    },
+                    "404": {
+                        "description": "Agent not found",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/management/agents/{id}/offline": {
+            "post": {
+                "description": "Manually set an agent's status to offline (management only)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Management"
+                ],
+                "summary": "Mark an agent as offline",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Agent ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Agent status set to offline"
+                    },
+                    "404": {
+                        "description": "Agent not found",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/fiberfx.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "agents.Role": {
+            "type": "string",
+            "enum": [
+                "backup",
+                "verification"
+            ],
+            "x-enum-varnames": [
+                "RoleBackup",
+                "RoleVerification"
+            ]
+        },
+        "agents.Status": {
+            "type": "string",
+            "enum": [
+                "online",
+                "offline"
+            ],
+            "x-enum-varnames": [
+                "StatusOnline",
+                "StatusOffline"
+            ]
+        },
+        "agents.agent": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "capabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_seen_at": {
+                    "type": "string"
+                },
+                "registered_at": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/agents.Role"
+                },
+                "status": {
+                    "$ref": "#/definitions/agents.Status"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "agents.registerRequest": {
+            "description": "Request body for registering a new agent",
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "10.0.0.1:9000"
+                },
+                "capabilities": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "example": [
+                        "[\"backup\"",
+                        " \"restore\"]"
+                    ]
+                },
+                "id": {
+                    "type": "string",
+                    "example": "agent-001"
+                },
+                "role": {
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/agents.Role"
+                        }
+                    ],
+                    "example": "backup"
+                }
+            }
+        },
+        "agents.registerResponse": {
+            "description": "Response body after successful agent registration",
+            "type": "object",
+            "properties": {
+                "access_token": {
+                    "type": "string",
+                    "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
+                "agent": {
+                    "$ref": "#/definitions/agents.agent"
+                }
+            }
+        },
+        "fiberfx.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "details": {},
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "description": "Type \"Bearer\" followed by a space and the token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0.0",
+	Host:             "localhost:3000",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "BackupFlex Core API",
+	Description:      "BackupFlex Core API provides agent coordination and management endpoints",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

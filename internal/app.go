@@ -3,6 +3,7 @@ package internal
 import (
 	"context"
 
+	"github.com/backupflex/core/internal/agents"
 	"github.com/backupflex/core/internal/config"
 	"github.com/backupflex/core/internal/server"
 	"github.com/go-core-fx/badgerfx"
@@ -31,6 +32,7 @@ func Run(version healthfx.Version) {
 		// bot.Module(),
 		//
 		// BUSINESS MODULES
+		agents.Module(),
 		fx.Supply(version),
 		//
 		fx.Invoke(func(lc fx.Lifecycle, logger *zap.Logger) {

@@ -2,10 +2,11 @@ package server
 
 import (
 	"github.com/backupflex/core/internal/server/docs"
+	"github.com/backupflex/core/internal/server/handlers/agents"
 	"github.com/go-core-fx/fiberfx"
+	"github.com/go-core-fx/fiberfx/handler"
 	"github.com/go-core-fx/fiberfx/health"
 	"github.com/go-core-fx/fiberfx/openapi"
-	"github.com/go-core-fx/fiberfx/statuscode"
 	"github.com/go-core-fx/fiberfx/validation"
 	"github.com/go-core-fx/logger"
 	"github.com/gofiber/fiber/v2"
@@ -27,20 +28,31 @@ func Module() fx.Option {
 
 		fx.Supply(docs.SwaggerInfo),
 
-		fx.Provide(health.NewHandler, fx.Private),
-		fx.Provide(openapi.NewHandler, fx.Private),
+		fx.Provide(
+			health.NewHandler, openapi.NewHandler,
+			fx.Annotate(agents.NewManagementHandler, fx.ResultTags(`group:"handlers"`)),
+			fx.Annotate(agents.NewAgentHandler, fx.ResultTags(`group:"handlers"`)),
+			fx.Private,
+		),
 
-		fx.Invoke(func(app *fiber.App, health *health.Handler, openapi *openapi.Handler) {
-			health.Register(app)
+		fx.Invoke(
+			fx.Annotate(
+				func(handlers []handler.Handler, healthHandler *health.Handler, openapiHandler *openapi.Handler, app *fiber.App) {
+					// Health endpoint
+					healthHandler.Register(app)
 
-			api := app.Group("api/v1")
-			openapi.Register(api.Group("docs"))
+					// Version 1 API group
+					v1 := app.Group("/api/v1")
+					openapiHandler.Register(v1.Group("/docs"))
 
-			api.Use(validation.Middleware)
+					v1.Use(validation.Middleware)
 
-			// messages.Register(api.Group("/messages"))
-
-			api.Use(statuscode.New())
-		}),
+					for _, h := range handlers {
+						h.Register(v1)
+					}
+				},
+				fx.ParamTags(`group:"handlers"`),
+			),
+		),
 	)
 }

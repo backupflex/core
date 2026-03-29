@@ -2,12 +2,111 @@
 @apiUrl={{baseUrl}}/api/v1
 
 ###
+# Health Check
 GET {{baseUrl}}/health HTTP/1.1
 
 ###
+# API Root
 GET {{apiUrl}} HTTP/1.1
 Accept: application/json
 
 ###
+# API Documentation
 GET {{apiUrl}}/docs HTTP/1.1
 Accept: application/json
+
+###
+# Agent Registration - Backup Agent
+# @name agentRegistration
+@token={{agentRegistration.response.body.$.access_token}}
+POST {{apiUrl}}/agents/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "id": "backup-agent-001",
+  "role": "backup",
+  "address": "10.0.0.100:9000",
+  "capabilities": ["backup", "compression", "encryption"]
+}
+
+###
+# Agent Registration - Verification Agent
+POST {{apiUrl}}/agents/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "id": "verification-agent-001",
+  "role": "verification",
+  "address": "10.0.0.101:9000",
+  "capabilities": ["verification", "integrity-check"]
+}
+
+###
+# Agent Heartbeat (requires authentication)
+# First, register an agent to get the access token
+# Then use the token in the Authorization header
+POST {{apiUrl}}/agents/heartbeat HTTP/1.1
+Authorization: Bearer {{token}}
+
+###
+# List All Agents (Management API)
+GET {{apiUrl}}/management/agents HTTP/1.1
+Accept: application/json
+
+###
+# Get Specific Agent (Management API)
+GET {{apiUrl}}/management/agents/backup-agent-001 HTTP/1.1
+Accept: application/json
+
+###
+# Delete Agent (Management API)
+DELETE {{apiUrl}}/management/agents/backup-agent-001 HTTP/1.1
+
+###
+# Set Agent Offline (Management API)
+POST {{apiUrl}}/management/agents/backup-agent-001/offline HTTP/1.1
+
+###
+# Get Non-existent Agent (Management API - should return 404)
+GET {{apiUrl}}/management/agents/non-existent-agent HTTP/1.1
+Accept: application/json
+
+###
+# Delete Non-existent Agent (Management API - should return 404)
+DELETE {{apiUrl}}/management/agents/non-existent-agent HTTP/1.1
+
+###
+# Set Non-existent Agent Offline (Management API - should return 404)
+POST {{apiUrl}}/management/agents/non-existent-agent/offline HTTP/1.1
+
+###
+# Register Agent with Invalid Role (should return 400)
+POST {{apiUrl}}/agents/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "id": "invalid-agent-001",
+  "role": "invalid-role",
+  "address": "10.0.0.102:9000",
+  "capabilities": ["backup"]
+}
+
+###
+# Register Agent with Missing ID (should return 400)
+POST {{apiUrl}}/agents/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "role": "backup",
+  "address": "10.0.0.103:9000",
+  "capabilities": ["backup"]
+}
+
+###
+# Heartbeat with Invalid Token (should return 401)
+POST {{apiUrl}}/agents/heartbeat HTTP/1.1
+Authorization: Bearer invalid-token
+
+###
+# Heartbeat without Token (should return 401)
+POST {{apiUrl}}/agents/heartbeat HTTP/1.1

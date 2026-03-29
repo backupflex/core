@@ -1,3 +1,14 @@
+// Package main provides entry point for the application.
+//
+//	@title						BackupFlex Core API
+//	@version					1.0.0
+//	@description				BackupFlex Core API provides agent coordination and management endpoints
+//	@host						localhost:3000
+//	@BasePath					/api/v1
+//	@securityDefinitions.apikey	BearerAuth
+//	@in							header
+//	@name						Authorization
+//	@description				Type "Bearer" followed by a space and the token.
 package main
 
 import (
